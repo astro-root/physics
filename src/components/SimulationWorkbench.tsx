@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Simulation } from '../lib/types';
+import type { DisplayDefinition, Simulation } from '../lib/types';
 import { useSimulationRuntime } from '../sandbox/useSimulationRuntime';
 import { Chart } from './Chart';
 import { formatValue, toCsv, download } from '../lib/format';
@@ -20,7 +20,7 @@ export function SimulationWorkbench({ simulation, compact = false }: Props) {
   const [speed, setSpeed] = useState(1);
   const scalars = rt.frame?.scalars || {};
 
-  const readouts = simulation.displayDefinitions.length
+  const readouts: DisplayDefinition[] = simulation.displayDefinitions.length
     ? simulation.displayDefinitions
     : Object.keys(scalars).slice(0, 8).map((key) => ({ key, label: key }));
 

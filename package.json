@@ -31,8 +31,10 @@
   },
   "devDependencies": {
     "@monaco-editor/react": "^4.6.0",
+    "@types/node": "^20.14.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "@types/supertest": "^6.0.2",
     "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^9.0.1",
     "supertest": "^7.0.0",

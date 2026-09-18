@@ -1,9 +1,12 @@
 import { Suspense, lazy, useState } from 'react';
 
 const Monaco = lazy(() =>
-  import('@monaco-editor/react').then((m) => ({ default: m.default })).catch(() => ({
-    default: () => null as never,
-  })),
+  import('@monaco-editor/react').then((m) => ({ default: m.default })).catch(
+    () =>
+      ({
+        default: () => null,
+      }) as unknown as { default: typeof import('@monaco-editor/react').default },
+  ),
 );
 
 interface Props {
