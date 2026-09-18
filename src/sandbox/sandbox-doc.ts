@@ -49,7 +49,7 @@ function post(msg) { self.postMessage(msg); }
 
 function buildModel(code) {
   // Author code is a function body evaluated *inside the worker*, which lives in
-  // an opaque origin with no network and no DOM. It receives only `PL`.
+  // an opaque origin with no network and no DOM. It receives only PL.
   const factory = new Function('PL', '"use strict";\n' + code);
   const m = factory(PL);
   if (!m || typeof m.init !== 'function' || typeof m.step !== 'function') {
