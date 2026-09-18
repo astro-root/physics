@@ -1,0 +1,10 @@
+{
+  "name": "Dynamis",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "postCreateCommand": "cp -n .env.example .env && npm install && npm run db:reset",
+  "forwardPorts": [5173, 8787],
+  "portsAttributes": {
+    "5173": { "label": "Dynamis (web)", "onAutoForward": "openPreview" },
+    "8787": { "label": "Dynamis (api)" }
+  }
+}

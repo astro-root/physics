@@ -1,0 +1,54 @@
+{
+  "name": "dynamis",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Dynamis — るーとの物理実験室。ブラウザ上で物理現象を数値計算して動かせる仮想実験室。",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm run content && tsc --noEmit && vite build",
+    "content": "node scripts/build-content.mjs",
+    "db:init": "node server/scripts/init-db.js",
+    "db:reset": "node server/scripts/reset.js",
+    "db:seed": "node server/scripts/seed.js",
+    "dev": "npm run content && vite",
+    "dev:api": "node server/index.js",
+    "dev:server": "concurrently -n api,web -c cyan,magenta \"npm:dev:api\" \"npm:dev:web:server\"",
+    "dev:web": "npm run content && vite",
+    "dev:web:server": "VITE_DATA_MODE=server vite",
+    "preview": "vite preview",
+    "start": "NODE_ENV=production node server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.0.1",
+    "supertest": "^7.0.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.6",
+    "vitest": "^2.1.1"
+  },
+  "optionalDependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.23.8"
+  }
+}
