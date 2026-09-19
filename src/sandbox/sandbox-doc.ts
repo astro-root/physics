@@ -6,8 +6,17 @@
  *     `allow-same-origin`, so it gets an opaque origin: no cookies, no storage,
  *     no access to the parent DOM, no credentialed requests.
  *   - Its CSP is `default-src 'none'` with scripts limited to the inline
- *     bootstrap and blob: workers. `connect-src 'none'` blocks fetch/XHR/WebSocket
- *     outright, so author code cannot call the API or any third party.
+ *     bootstrap and blob: workers. `'unsafe-eval'` is required in `script-src`
+ *     because the whole execution model is `new Function('PL', code)` — that
+ *     is how author-supplied simulation/renderer/compute code is turned into
+ *     a callable function, in both this host document and the worker. Without
+ *     it, every `new Function(...)` call is blocked by the browser (a CSP
+ *     violation, not a JS error) and no simulation can ever initialize. This
+ *     is safe here because `'unsafe-eval'` only lifts the eval restriction;
+ *     it does not grant network access (`connect-src 'none'`), DOM access
+ *     (opaque sandboxed origin, no `allow-same-origin`), or storage access.
+ *     `connect-src 'none'` blocks fetch/XHR/WebSocket outright, so author code
+ *     cannot call the API or any third party.
  *   - The physics step function runs in a Web Worker, one more hop away from the
  *     renderer and the canvas, and can be terminated at any time.
  *   - The parent only ever receives structured-clone data over postMessage and
@@ -388,7 +397,7 @@ export function buildSandboxDocument(): string {
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' blob:; worker-src blob:; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <style>
   html,body { margin:0; height:100%; background:transparent; overflow:hidden; }
   #stage { display:block; width:100%; height:100%; touch-action:none; }

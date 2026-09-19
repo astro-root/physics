@@ -55,7 +55,7 @@ export function AdminDashboard() {
             <tbody>
               {data.byCategory.filter((c: any) => c.n > 0).map((c: any) => (
                 <tr key={c.slug}>
-                  <td><Link to={`/?category=${c.slug}`}>{c.name}</Link></td>
+                  <td><Link to={`/catalog?category=${c.slug}`}>{c.name}</Link></td>
                   <td className="num">{c.n}</td>
                 </tr>
               ))}

@@ -22,7 +22,7 @@ export function SimulationPage() {
     return (
       <div className="empty">
         <p>{error}</p>
-        <Link to="/">カタログに戻る</Link>
+        <Link to="/catalog">カタログに戻る</Link>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export function SimulationPage() {
         <p style={{ color: 'var(--ink-dim)' }}>{sim.shortDescription}</p>
         <div className="tag-row">
           {sim.tags.map((t) => (
-            <Link className="tag" key={t.slug} to={`/?tags=${t.slug}`}>{t.name}</Link>
+            <Link className="tag" key={t.slug} to={`/catalog?tags=${t.slug}`}>{t.name}</Link>
           ))}
         </div>
       </header>

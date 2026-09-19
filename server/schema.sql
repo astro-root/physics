@@ -86,7 +86,18 @@ CREATE TABLE IF NOT EXISTS simulation_versions (
 );
 
 -- Full-text search over the public catalogue.
+--
+-- This must NOT be a "contentless" table (content=''): the search route in
+-- server/routes/simulations.js reads the `slug` column straight back out of
+-- a MATCH query's results to know which rows matched. A contentless FTS5
+-- table never stores its column values -- every SELECT on it returns NULL
+-- for every column, even though MATCH itself still finds the right rowids.
+-- That silently turned `slug` into NULL for every hit, so `s.slug IN (NULL)`
+-- matched nothing and full-text search returned zero results for every
+-- query. Keeping FTS5's default (non-contentless) storage fixes this while
+-- requiring no changes to the query code, which already reads the columns
+-- back the normal way.
 CREATE VIRTUAL TABLE IF NOT EXISTS simulations_fts USING fts5(
   slug, title, title_en, short_description, description, physics_topics,
-  content='', tokenize='unicode61'
+  tokenize='unicode61'
 );

@@ -44,9 +44,34 @@ export function useSimulationRuntime(sim: Simulation | null) {
 
   const srcDoc = useMemo(() => buildSandboxDocument(), []);
 
+  // The sandboxed iframe announces `host-ready` once its own script has run and
+  // its `message` listener is attached (see sandbox-doc.ts). Posting a `load`
+  // before that listener exists is a silent no-op: postMessage does not queue
+  // or error when the receiving document has no listener yet, so the model
+  // never loads and nothing on screen ever indicates why. We therefore track
+  // readiness explicitly and hold the most recent pending load until it fires,
+  // instead of guessing at a fixed delay (which is unreliable across devices,
+  // CPU load, and iframe/document construction time).
+  const hostReadyRef = useRef(false);
+  const pendingLoadRef = useRef<Record<string, unknown> | null>(null);
+
   const post = useCallback((message: unknown) => {
     frameRef.current?.contentWindow?.postMessage(message, '*');
   }, []);
+
+  const postLoad = useCallback(
+    (message: Record<string, unknown>) => {
+      if (hostReadyRef.current) {
+        pendingLoadRef.current = null;
+        post(message);
+      } else {
+        // Not ready yet: remember only the latest request and let the
+        // `host-ready` handler flush it once the sandbox is listening.
+        pendingLoadRef.current = message;
+      }
+    },
+    [post],
+  );
 
   const resetSeries = useCallback(() => {
     seriesRef.current = { keys: [], data: {}, length: 0, version: seriesRef.current.version + 1 };
@@ -59,7 +84,7 @@ export function useSimulationRuntime(sim: Simulation | null) {
       setError(null);
       setReady(false);
       resetSeries();
-      post({
+      postLoad({
         type: 'load',
         code: sim.simulationCode,
         rendererCode: sim.rendererCode,
@@ -67,7 +92,7 @@ export function useSimulationRuntime(sim: Simulation | null) {
         options: sim.runtimeOptions || {},
       });
     },
-    [sim, params, post, resetSeries],
+    [sim, params, postLoad, resetSeries],
   );
 
   useEffect(() => {
@@ -75,18 +100,17 @@ export function useSimulationRuntime(sim: Simulation | null) {
     const next = defaultParams(sim.parameterDefinitions);
     setParams(next);
     setRunning(false);
-    const timer = window.setTimeout(() => {
-      post({
-        type: 'load',
-        code: sim.simulationCode,
-        rendererCode: sim.rendererCode,
-        params: next,
-        options: sim.runtimeOptions || {},
-      });
-    }, 60);
-    return () => window.clearTimeout(timer);
+    setError(null);
+    setReady(false);
+    postLoad({
+      type: 'load',
+      code: sim.simulationCode,
+      rendererCode: sim.rendererCode,
+      params: next,
+      options: sim.runtimeOptions || {},
+    });
     // Reloading on slug/version is what we want: editing code in admin bumps version.
-  }, [sim?.slug, sim?.version, sim?.simulationCode, sim?.rendererCode, post]);
+  }, [sim?.slug, sim?.version, sim?.simulationCode, sim?.rendererCode, postLoad]);
 
   // Receive telemetry.
   useEffect(() => {
@@ -94,6 +118,14 @@ export function useSimulationRuntime(sim: Simulation | null) {
       if (!frameRef.current || event.source !== frameRef.current.contentWindow) return;
       const msg = event.data || {};
       switch (msg.type) {
+        case 'host-ready':
+          hostReadyRef.current = true;
+          if (pendingLoadRef.current) {
+            const pending = pendingLoadRef.current;
+            pendingLoadRef.current = null;
+            post(pending);
+          }
+          break;
         case 'ready':
           setReady(true);
           setError(null);
@@ -145,7 +177,19 @@ export function useSimulationRuntime(sim: Simulation | null) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  useEffect(() => () => post({ type: 'dispose' }), [post]);
+  // NOTE: there is deliberately no `useEffect(() => () => post({ type:
+  // 'dispose' }), [post])` cleanup here. It looks like reasonable hygiene,
+  // but it actively breaks every simulation in development: React 18's
+  // <React.StrictMode> (enabled in main.tsx) intentionally mounts, cleans up,
+  // and re-mounts every effect once on first mount to surface exactly this
+  // kind of bug. A cleanup-only effect (`useEffect(() => fn, deps)`, no setup
+  // body) runs `fn` during that throwaway simulated unmount, which posted
+  // `dispose` and terminated the worker for good -- nothing afterwards ever
+  // sent a fresh `load` to recreate it, so every "run" press silently posted
+  // to a worker that no longer existed, with no console error. It is also
+  // unnecessary: destroying the iframe element (on a real unmount) already
+  // discards its browsing context and terminates any worker inside it, so no
+  // manual dispose message is needed for cleanup to happen correctly.
 
   const setParam = useCallback(
     (key: string, value: unknown) => {

@@ -342,8 +342,14 @@ simulationsRouter.post(
       .get(id, Number(req.params.version));
     if (!existing || !row) return res.status(404).json({ error: 'No such version.' });
     const snapshot = json(row.snapshot, null);
+    // Restoring brings back an old version's *content* only. It must not also
+    // revert the simulation's current publish state (e.g. restoring the first,
+    // pre-publish draft version of an already-published simulation should not
+    // silently unpublish it), so `status` intentionally comes from the current
+    // row, not from the historical snapshot.
     const data = simulationInput.parse({
       ...snapshot,
+      status: existing.status,
       tags: (snapshot.tags || []).map((t) => (typeof t === 'string' ? t : t.slug)),
       slug: existing.slug,
       versionSummary: `Restored version ${row.version}`,

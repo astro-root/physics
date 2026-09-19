@@ -172,6 +172,7 @@ export async function querySimulations(query: Query = {}) {
     if (sort === 'title') return a.title.localeCompare(b.title, 'ja');
     if (sort === 'difficulty') return a.difficulty - b.difficulty || a.sortOrder - b.sortOrder;
     if (sort === 'created') return b.createdAt.localeCompare(a.createdAt) || a.sortOrder - b.sortOrder;
+    if (sort === 'recent') return b.updatedAt.localeCompare(a.updatedAt) || a.sortOrder - b.sortOrder;
     return a.sortOrder - b.sortOrder;
   });
 
@@ -382,7 +383,14 @@ export const localStore = {
   async restoreVersion(id: number, version: number) {
     const found = (readOverlay().versions[String(id)] || []).find((v) => v.version === version);
     if (!found) throw new Error('その版は残っていません。');
-    return saveSimulation({ ...found.snapshot, versionSummary: `版 ${version} を復元` }, id);
+    // Restoring brings back the *content* of an old version (title, code,
+    // parameters, ...). It must not also revert the current publish state:
+    // e.g. restoring the very first (draft) version of an already-published
+    // simulation should not silently unpublish it. `status` is therefore
+    // deliberately left out of the snapshot spread so `saveSimulation` falls
+    // back to the simulation's current status.
+    const { status: _restoredStatus, ...content } = found.snapshot as any;
+    return saveSimulation({ ...content, versionSummary: `版 ${version} を復元` }, id);
   },
 
   async createTag(body: any) {
