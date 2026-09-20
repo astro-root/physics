@@ -89,6 +89,19 @@ function reset(nextParams) {
   post(sample());
 }
 
+/** True only for a finite JS number; recurses through plain objects/arrays
+ *  so a NaN or Infinity buried inside "state" is still caught. Author state
+ *  can be any shape, so this stays generic rather than assuming a schema. */
+function isFiniteDeep(value, depth) {
+  if (depth > 6) return true; // don't chase pathological structures forever
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (Array.isArray(value)) return value.every((v) => isFiniteDeep(v, depth + 1));
+  if (value && typeof value === 'object') {
+    return Object.values(value).every((v) => isFiniteDeep(v, depth + 1));
+  }
+  return true; // strings, booleans, null, undefined, functions: not our concern
+}
+
 function advance() {
   const start = Date.now();
   const target = (frameInterval / 1000) * speed;
@@ -102,11 +115,27 @@ function advance() {
     steps++;
     n++;
     if ((n & 31) === 0 && Date.now() - start > budgetMs) break;
+    if ((n & 63) === 0 && !isFiniteDeep(state, 0)) {
+      throw new Error('Simulation state became non-finite (NaN/Infinity) -- likely a numerically unstable step at these parameter values.');
+    }
+  }
+  if (!isFiniteDeep(state, 0)) {
+    throw new Error('Simulation state became non-finite (NaN/Infinity) -- likely a numerically unstable step at these parameter values.');
   }
   const frame = sample();
   frame.budgetExceeded = Date.now() - start > budgetMs;
+  // Report "done" as no-longer-running *in the same frame that announces it*,
+  // rather than flipping "running" only after sample() has already captured
+  // the old value. Otherwise the frame that says done:true also (incorrectly)
+  // says running:true, and the host's hang-watchdog treats "no more frames
+  // after this one" -- which is the correct behaviour once a run finishes --
+  // as a hang, and kills the worker.
+  if (frame.done) {
+    running = false;
+    frame.running = false;
+    if (timer) { clearInterval(timer); timer = null; }
+  }
   post(frame);
-  if (frame.done) { running = false; if (timer) { clearInterval(timer); timer = null; } }
 }
 
 function startLoop() {
@@ -133,8 +162,21 @@ self.onmessage = (event) => {
       }
       case 'params': {
         params = Object.assign({}, params, msg.values);
-        if (msg.hard || !model.onParams) reset(params);
-        else { model.onParams(state, params); post(sample()); }
+        if (msg.hard) {
+          reset(params);
+        } else {
+          // A "soft" (non-restart) parameter change should not restart the
+          // run from t=0: only "restart"-flagged parameters ask for that
+          // (see setParam in useSimulationRuntime.ts). Previously this branch
+          // only avoided the reset when the simulation itself implemented
+          // onParams -- but none of the shipped simulations do, so in
+          // practice *every* slider drag silently reset every run to t=0.
+          // Swap the params in place and let the model react to them on the
+          // next step() call; call onParams() too when a simulation does
+          // provide it, so it can react immediately rather than next tick.
+          if (model.onParams) model.onParams(state, params);
+          post(sample());
+        }
         break;
       }
       case 'run': running = true; startLoop(); break;
@@ -322,11 +364,31 @@ function startWorker(code, params, options) {
       latest = msg;
       latest.params = currentParams;
       dirty = true;
+      // Only arm the hang-watchdog while the simulation is actually expected
+      // to keep producing frames. A paused or naturally-finished simulation
+      // sends one last frame with running:false and then, correctly, sends
+      // nothing further -- that is not a hang. Re-arming unconditionally here
+      // used to fire a bogus "stopped responding" error a few seconds after
+      // every pause/finish and permanently terminate the worker, so no
+      // subsequent "run" press could ever do anything again.
       clearTimeout(watchdog);
-      watchdog = setTimeout(() => {
-        toParent({ type: 'error', stage: 'watchdog', message: 'Simulation stopped responding and was terminated.' });
-        if (worker) { worker.terminate(); worker = null; }
-      }, 5000);
+      if (msg.running) {
+        watchdog = setTimeout(() => {
+          toParent({ type: 'error', stage: 'watchdog', message: 'Simulation stopped responding and was terminated.' });
+          if (worker) { worker.terminate(); worker = null; }
+        }, 5000);
+      }
+      // The parent only ever reads t/steps/scalars/series/running/done/
+      // budgetExceeded (see useSimulationRuntime.ts) -- never "draw", which
+      // is this frame's full render payload and, for data-heavy simulations,
+      // can be hundreds of KB to over a MB per frame. Forwarding it to the
+      // parent structured-clones that payload a second time for no reason,
+      // every frame, at up to 60 fps. Strip it before relaying.
+      if (msg.draw !== undefined) {
+        const { draw: _draw, ...rest } = msg;
+        toParent(rest);
+        return;
+      }
     }
     toParent(msg);
   };

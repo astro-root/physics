@@ -6,48 +6,50 @@
 */
 
 :root {
-  --bg: #090e13;
-  --bg-well: #0c141b;
-  --panel: #101922;
-  --panel-raised: #16212c;
-  --panel-overlay: #1b2732;
-  --line: #22313e;
-  --line-strong: #31465a;
-  --ink: #dce7f0;
-  --ink-dim: #9fb3c4;
-  --muted: #7d93a6;
-  --cyan: #5ac8fa;
+  --bg: #05080b;
+  --bg-well: #0a1119;
+  --panel: #0e161e;
+  --panel-raised: #141f29;
+  --panel-overlay: #1a2733;
+  --line: #1e2c38;
+  --line-strong: #2c4256;
+  --ink: #eaf2f8;
+  --ink-dim: #a7bccd;
+  --muted: #748899;
+  --cyan: #4fd1ff;
+  --cyan-dim: #2a5b73;
   --amber: #ffb454;
-  --green: #8ce99a;
+  --green: #79e0a0;
   --rose: #ff8fa3;
-  --violet: #c0a6ff;
+  --violet: #b79bff;
   --focus: #7fd8ff;
 
   /* One hairline of "glass" catching light along the top edge of a raised
      surface, plus a soft contact shadow beneath it. This reads as a lit
      instrument bezel rather than the generic soft-grey card shadow. */
-  --shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 2px 8px rgba(2, 5, 8, 0.35);
-  --shadow-md: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(2, 5, 8, 0.45);
-  --shadow-lg: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 20px 48px rgba(2, 5, 8, 0.55);
-  --shadow: var(--shadow-md); /* kept for anything still referencing the old name */
+  --shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 28px 64px rgba(0, 0, 0, 0.6);
+  --glow-cyan: 0 0 0 1px rgba(79, 209, 255, 0.25), 0 0 32px rgba(79, 209, 255, 0.18);
+  --shadow: var(--shadow-md);
 
-  --radius-sm: 3px;
-  --radius: 4px;
-  --radius-lg: 8px;
-  --radius-xl: 14px;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
 
   --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --dur-fast: 0.12s;
-  --dur: 0.2s;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.14s;
+  --dur: 0.28s;
 
   /* A faint graph-paper module, reused everywhere a "measurement surface"
      needs a structural (not decorative) hint of the instrument's grid. */
-  --grid-line: rgba(120, 165, 200, 0.05);
-  --grid-line-strong: rgba(120, 165, 200, 0.09);
-  --grid-cell: 28px;
+  --grid-line: rgba(140, 190, 220, 0.05);
+  --grid-line-strong: rgba(140, 190, 220, 0.1);
+  --grid-cell: 32px;
 }
 
 * { box-sizing: border-box; }
@@ -57,23 +59,24 @@ html, body, #root { height: 100%; }
 body {
   margin: 0;
   background:
-    radial-gradient(1200px 600px at 70% -10%, rgba(90, 200, 250, 0.07), transparent 60%),
+    radial-gradient(900px 500px at 82% -6%, rgba(79, 209, 255, 0.13), transparent 60%),
+    radial-gradient(700px 500px at -6% 30%, rgba(183, 155, 255, 0.06), transparent 55%),
     linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / var(--grid-cell) var(--grid-cell),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / var(--grid-cell) var(--grid-cell),
     var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 15.5px;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   font-variant-numeric: tabular-nums;
 }
 
-h1, h2, h3, h4 { font-weight: 600; line-height: 1.2; margin: 0; letter-spacing: -0.012em; }
-h1 { font-size: 1.9rem; letter-spacing: -0.02em; }
-h2 { font-size: 1.25rem; }
-h3 { font-size: 1.02rem; }
-h4 { font-size: 0.92rem; color: var(--ink-dim); font-weight: 600; }
+h1, h2, h3, h4 { font-weight: 650; line-height: 1.16; margin: 0; letter-spacing: -0.018em; }
+h1 { font-size: 2.15rem; letter-spacing: -0.025em; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.08rem; }
+h4 { font-size: 0.92rem; color: var(--ink-dim); font-weight: 600; letter-spacing: 0; }
 p { margin: 0 0 0.8em; max-width: 72ch; }
 a { color: var(--cyan); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -203,21 +206,25 @@ input[type='checkbox'] { accent-color: var(--cyan); width: 16px; height: 16px; }
   background: var(--panel-raised);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  padding: 7px 13px;
+  padding: 8px 15px;
+  font-weight: 550;
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease),
-    transform var(--dur-fast) var(--ease);
+    transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
 }
-.btn:hover:not(:disabled) { background: #1d2c38; border-color: #45607a; }
+.btn:hover:not(:disabled) { background: #1c2a37; border-color: #3d5a72; }
 .btn:active:not(:disabled) { transform: translateY(1px); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: #12405a; border-color: #1d6d93; color: #e8f6ff; }
-.btn-primary:hover:not(:disabled) { background: #17516f; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(180deg, #1a5875, #123f56);
+  border-color: #2c88ac; color: #eefaff;
+}
+.btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #1f6a8c, #164e69); box-shadow: var(--glow-cyan); }
 .btn-ghost { background: transparent; border-color: transparent; }
 .btn-ghost:hover:not(:disabled) { background: var(--panel); border-color: var(--line); }
-.btn-danger { border-color: #6d2b38; color: #ffc4cd; }
+.btn-danger { border-color: #7a3341; color: #ffc4cd; }
 .btn-danger:hover:not(:disabled) { background: #3a1a22; }
-.btn-sm { padding: 4px 9px; font-size: 0.85rem; }
+.btn-sm { padding: 5px 10px; font-size: 0.85rem; }
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* -------------------------------------------------------------- data + tags */
@@ -257,14 +264,16 @@ input[type='checkbox'] { accent-color: var(--cyan); width: 16px; height: 16px; }
   background:
     linear-gradient(var(--grid-line-strong) 1px, transparent 1px) 0 0 / var(--grid-cell) var(--grid-cell),
     linear-gradient(90deg, var(--grid-line-strong) 1px, transparent 1px) 0 0 / var(--grid-cell) var(--grid-cell),
-    linear-gradient(180deg, #0c151d, #0a1016);
-  border: 1px solid var(--line);
+    linear-gradient(180deg, #0a121a, #060b10);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   overflow: hidden;
   min-height: 320px;
   aspect-ratio: 16 / 10;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--dur) var(--ease);
 }
+.stage:has(~ .transport .status-dot.running) { box-shadow: var(--shadow-md), var(--glow-cyan); }
 .stage iframe { width: 100%; height: 100%; border: 0; display: block; }
 @media (max-width: 700px) { .stage { aspect-ratio: 4 / 3; min-height: 260px; } }
 
@@ -289,20 +298,21 @@ input[type='checkbox'] { accent-color: var(--cyan); width: 16px; height: 16px; }
 .legend i { display: inline-block; width: 10px; height: 2px; vertical-align: middle; margin-right: 4px; }
 
 /* -------------------------------------------------------------------- cards */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 .card {
   display: flex; flex-direction: column; gap: 8px;
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg);
-  padding: 14px; color: inherit;
+  background: linear-gradient(165deg, var(--panel-raised), var(--panel));
+  border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 16px; color: inherit;
   transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .card:hover {
-  border-color: var(--line-strong);
+  border-color: var(--cyan-dim);
   text-decoration: none;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
-.card h3 { font-size: 1rem; }
+.card h3 { font-size: 1.02rem; }
 .card p { font-size: 0.85rem; color: var(--ink-dim); margin: 0; }
 .card-meta { display: flex; gap: 8px; align-items: center; font-size: 0.74rem; color: var(--muted); flex-wrap: wrap; margin-top: auto; }
 

@@ -72,7 +72,7 @@ export function SimulationWorkbench({ simulation, compact = false }: Props) {
             <button className="btn btn-primary" onClick={rt.controls.toggle} aria-pressed={rt.running}>
               {rt.running ? '一時停止' : '実行'}
             </button>
-            <button className="btn" onClick={() => rt.controls.step(60)}>1 ステップ進める</button>
+            <button className="btn" onClick={() => rt.controls.step(60)}>1 コマ進める</button>
             <button className="btn" onClick={rt.controls.reset}>最初から</button>
             <label className="mono" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem' }}>
               <span style={{ color: 'var(--muted)' }}>速度</span>
@@ -91,8 +91,9 @@ export function SimulationWorkbench({ simulation, compact = false }: Props) {
           </div>
 
           {rt.error && (
-            <div className="notice error" role="alert" style={{ marginBottom: 12 }}>
-              シミュレーションが停止しました — {rt.error}
+            <div className="notice error" role="alert" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <span>シミュレーションが停止しました — {rt.error}</span>
+              <button className="btn btn-sm" onClick={() => rt.reload()}>再読み込み</button>
             </div>
           )}
           {rt.frame?.budgetExceeded && !rt.error && (
