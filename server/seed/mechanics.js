@@ -216,7 +216,15 @@ return {
 const d = frame.draw;
 const a = (d.angle * Math.PI) / 180;
 const span = Math.max(d.idealRange * 1.15, 10);
-const top = Math.max(d.apex * 1.3, (d.v0 * d.v0) / (2 * d.g) * 0.6, 5);
+// The view bounds must be fixed for the whole flight, computed only from the
+// launch conditions (v0, angle, g, h0), which never change mid-flight. Using
+// the live running-maximum d.apex here instead (as this used to) made the
+// view rescale itself upward every single frame while the projectile was
+// still climbing, since d.apex keeps growing until the peak -- so the trail
+// drawn so far got remapped to a slightly different scale on every frame,
+// which reads as the trajectory visibly bending as it flies.
+const idealApex = d.h0 + ((d.v0 * Math.sin(a)) ** 2) / (2 * d.g);
+const top = Math.max(idealApex * 1.25, (d.v0 * d.v0) / (2 * d.g) * 0.55, 5);
 const view = helpers.view({ xmin: -span * 0.04, xmax: span, ymin: -top * 0.08, ymax: top }, { stretch: true, pad: 26 });
 helpers.grid(view, span / 8, top / 6);
 // Ideal (drag-free) parabola for comparison.
