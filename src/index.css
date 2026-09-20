@@ -400,17 +400,25 @@ table.data td.num, table.data th.num { text-align: right; font-family: var(--mon
 
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
-  font-size: 0.74rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--cyan); margin: 0 0 14px;
+  font-size: 0.76rem; letter-spacing: 0.14em; text-transform: none;
+  color: var(--ink-dim); margin: 0 0 20px;
+  background: var(--panel-raised); border: 1px solid var(--line-strong);
+  padding: 6px 14px 6px 10px; border-radius: 999px;
 }
-.eyebrow::before {
-  content: ''; width: 14px; height: 1px; background: var(--cyan); opacity: 0.7;
+.eyebrow-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex: none;
+  box-shadow: 0 0 6px rgba(121, 224, 160, 0.7);
+  animation: pulse-dot 2s var(--ease) infinite;
+}
+.accent-text {
+  background: linear-gradient(100deg, var(--cyan), #8fe6ff 60%, var(--cyan));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .hero h1 {
-  font-size: clamp(2rem, 5.2vw, 3.3rem);
-  line-height: 1.18;
-  letter-spacing: -0.02em;
-  margin-bottom: 18px;
+  font-size: clamp(2.3rem, 6vw, 3.9rem);
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
 }
 .lede { font-size: 1.03rem; color: var(--ink-dim); max-width: 46ch; margin-bottom: 22px; }
 .hero-note { color: var(--muted); font-size: 0.8rem; margin-top: 14px; }
@@ -443,6 +451,12 @@ table.data td.num, table.data th.num { text-align: right; font-family: var(--mon
 .feature {
   border-left: 2px solid var(--line-strong);
   padding: 2px 0 2px 16px;
+}
+.feature-glyph {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; margin-bottom: 10px;
+  border-radius: var(--radius-sm); background: var(--panel-raised); border: 1px solid var(--line-strong);
+  color: var(--cyan); font-size: 1.05rem;
 }
 .feature h3 { font-size: 0.98rem; margin-bottom: 6px; }
 .feature p { font-size: 0.89rem; color: var(--ink-dim); margin: 0; }

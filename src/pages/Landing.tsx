@@ -31,9 +31,12 @@ export function LandingPage() {
     <div className="landing">
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow mono">Dynamis</p>
+          <p className="eyebrow mono">
+            <span className="eyebrow-dot" aria-hidden="true" />
+            {total || 30} 個のシミュレーションが常時稼働中
+          </p>
           <h1>
-            物理は、読むより<br />動かしたほうが早い。
+            物理は、読むより<br /><span className="accent-text">動かした</span>ほうが早い。
           </h1>
           <p className="lede">
             るーとの物理実験室へようこそ。高校物理から宇宙論まで、{total || 30} 種類の現象を
@@ -62,26 +65,32 @@ export function LandingPage() {
         <h2>ここでできること</h2>
         <div className="pitch-grid">
           <Feature
+            glyph="∫"
             title="式ではなく、運動を見る"
             body="運動方程式をその場で数値積分しています。空気抵抗を入れれば射程が縮み、時間刻みを粗くすればエネルギーがずれる。式の意味が、画面の変化として返ってきます。"
           />
           <Feature
+            glyph="σ"
             title="測って、フィットして、誤差を出す"
             body="実験モードでは、振り子の周期を記録して T²–L の傾きから g を求めるところまでできます。測定にはばらつきが乗るので、点を増やすと値が寄っていく感触もそのまま体験できます。"
           />
           <Feature
+            glyph="Δ"
             title="保存量がいつも見えている"
             body="エネルギー・運動量・角運動量のずれを画面に出しています。数値計算が信用できるかどうかを、結果ではなく保存量で判断する練習になります。"
           />
           <Feature
+            glyph="⇩"
             title="データは持ち帰れる"
             body="読み取り値も時系列も CSV / JSON で書き出せます。レポートや課題の題材として、そのまま表計算ソフトに読み込めます。"
           />
           <Feature
+            glyph="+"
             title="増やすのにコードは触らない"
             body="管理画面でコードとパラメータを書いて、検証してプレビューして公開。アプリ本体のソースは一切触らずに現象を追加できます。"
           />
           <Feature
+            glyph="⧉"
             title="実行は完全に隔離"
             body="シミュレーションのコードは、オリジンを持たない iframe の中の Web Worker で動きます。通信も DOM も保存領域も届きません。"
           />
@@ -137,9 +146,10 @@ function Stat({ n, k }: { n: string; k: string }) {
   );
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+function Feature({ title, body, glyph }: { title: string; body: string; glyph: string }) {
   return (
     <div className="feature">
+      <span className="feature-glyph mono" aria-hidden="true">{glyph}</span>
       <h3>{title}</h3>
       <p>{body}</p>
     </div>
