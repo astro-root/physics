@@ -9,7 +9,7 @@ export function Layout() {
       <header className="topbar">
         <Link to="/" className="brand" style={{ color: 'inherit' }}>
           <span className="brand-mark" aria-hidden="true" />
-          <span>Dynamis<span style={{ color: 'var(--muted)', fontWeight: 400 }}> — るーとの物理実験室</span></span>
+          <span>Dynamis<span className="brand-sub" style={{ color: 'var(--muted)', fontWeight: 400 }}> — るーとの物理実験室</span></span>
         </Link>
         <nav aria-label="メインナビゲーション">
           <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>ホーム</NavLink>

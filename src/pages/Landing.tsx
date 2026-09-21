@@ -36,7 +36,7 @@ export function LandingPage() {
             {total || 30} 個のシミュレーションが常時稼働中
           </p>
           <h1>
-            物理は、読むより<br /><span className="accent-text">動かした</span>ほうが早い。
+            物理は、読むより<br />動かしたほうが早い。
           </h1>
           <p className="lede">
             るーとの物理実験室へようこそ。高校物理から宇宙論まで、{total || 30} 種類の現象を

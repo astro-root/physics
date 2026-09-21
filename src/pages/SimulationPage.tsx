@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import type { Simulation } from '../lib/types';
 import { TYPE_LABELS, LEVEL_LABELS } from '../lib/types';
 import { SimulationWorkbench } from '../components/SimulationWorkbench';
+import Formula from '../components/Formula';
 import { useAuth } from '../lib/auth';
 
 export function SimulationPage() {
@@ -58,11 +59,11 @@ export function SimulationPage() {
           {sim.formulas.length > 0 && (
             <>
               <h3>式</h3>
-              <ul className="mono" style={{ listStyle: 'none', padding: 0 }}>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
                 {sim.formulas.map((f, i) => (
-                  <li key={i} style={{ padding: '6px 0', borderBottom: '1px solid var(--line)' }}>
-                    {f.text}
-                    {f.note && <span style={{ color: 'var(--muted)', fontFamily: 'var(--sans)', marginLeft: 10 }}>{f.note}</span>}
+                  <li key={i} style={{ padding: '8px 0', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+                    <Formula text={f.text} />
+                    {f.note && <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{f.note}</span>}
                   </li>
                 ))}
               </ul>
